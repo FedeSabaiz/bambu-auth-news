@@ -4,14 +4,17 @@ import firebase from '../utils/firebase';
 import useForm from '../hooks/useForm';
 import 'firebase/auth';
 
-function Login({history}){
+function Login({ setSession}){
 
     const catchData = async (inputs) => {
         const data = await firebase.auth().signInWithEmailAndPassword(inputs.email, inputs.password);
         console.log(data)
         if(data) {
-            sessionStorage.setItem('jtToken', data);
-            history.push('/dashboard');
+            setSession({
+                user: data
+            });
+            sessionStorage.setItem('newsToken', data);
+           
         }
         // if (error) alert(`Error con tu login: ${error}`);
     };
