@@ -1,10 +1,12 @@
 import React from 'react';
+import { Redirect } from 'react-router-dom';
 import useForm from '../hooks/useForm';
 import firebase from '../utils/firebase';
 import Input from '../common/Input';
 import 'firebase/auth';
 
-const Signup = ({history}) => {
+const Signup = ({session, setSession}) => {
+
 
     const catchData = async (inputs) => {
         if(inputs.password === inputs.confirm_password){
@@ -18,14 +20,15 @@ const Signup = ({history}) => {
             console.log(errorMessage)
             // ...
             });
-            console.log(data);
             if(data){
                 if(data.errors) console.log(data.errors);
                 delete inputs.password;
                 await firebase.firestore().collection('users').add({
                                 ...inputs
                             });
-                history.push('/dashboard');
+                            setSession({
+                                user:data
+                            })
             }
         } else {
             alert('Tu contraseña no coincide');
@@ -40,6 +43,7 @@ const Signup = ({history}) => {
 
     return (
         <>
+            {session.user !== null ? <Redirect to="/dashboard"/> : <></>}
              <form onSubmit={handleSubmit}>
                 < Input
                 name = "first_name"
