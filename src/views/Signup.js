@@ -2,6 +2,7 @@ import React from 'react';
 import useForm from '../hooks/useForm';
 import firebase from '../utils/firebase';
 import Input from '../common/Input';
+import 'firebase/auth';
 
 const Signup = ({history}) => {
 
@@ -9,13 +10,22 @@ const Signup = ({history}) => {
         if(inputs.password === inputs.confirm_password){
             delete inputs.confirm_password;
             console.log(inputs)
-            const data = await firebase.firestore().collection('users').add({
-                                ...inputs
-                            });
+            const data = await firebase.auth().createUserWithEmailAndPassword(inputs.email, inputs.password).catch(function(error) {
+            // Handle Errors here.
+            var errorCode = error.code;
+            console.log(errorCode)
+            var errorMessage = error.message;
+            console.log(errorMessage)
+            // ...
+            });
             console.log(data);
             if(data){
                 if(data.errors) console.log(data.errors);
-                history.push('/login');
+                delete inputs.password;
+                await firebase.firestore().collection('users').add({
+                                ...inputs
+                            });
+                history.push('/dashboard');
             }
         } else {
             alert('Tu contraseña no coincide');
